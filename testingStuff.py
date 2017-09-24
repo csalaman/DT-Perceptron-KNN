@@ -3,22 +3,27 @@ import datasets as data
 import runClassifier as run
 import numpy
 
-d = data.TennisData
 
-print("AlwaysPredictOne:")
-h = du.AlwaysPredictOne({})
-run.trainTestSet(h,d)
-print "\n"
+def runTest(d):
 
-print("AlwaysPredictMostFrequent:")
-h = du.AlwaysPredictMostFrequent({})
-run.trainTestSet(h,d)
-print "\n"
+    print "AlwaysPredictOne: "
+    h = du.AlwaysPredictOne({})
+    run.trainTestSet(h,d)
 
-print("FirstFeatureClassifier:")
-print("FirstFeatureClassifier:")
-h = du.FirstFeatureClassifier({})
-run.trainTestSet(h,d)
+    print "AlwaysPredictMostFrequent:"
+    h = du.AlwaysPredictMostFrequent({})
+    run.trainTestSet(h,d)
+
+    print "FirstFeatureClassifier:"
+    h = du.FirstFeatureClassifier({})
+    run.trainTestSet(h,d)
+
+
+
+runTest(data.TennisData)
+print '\n'
+runTest(data.SentimentData)
+
 
 
 # h.train(d.X,d.Y)
