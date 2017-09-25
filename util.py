@@ -53,7 +53,7 @@ def uniq(seq, idfun=None):
 
 def mode(seq):
   if len(seq) == 0:
-    return 1.
+    return 1
   else:
     cnt = {}
     for item in seq:
