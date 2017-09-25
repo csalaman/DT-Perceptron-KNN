@@ -32,7 +32,7 @@ class DT(BinaryClassifier):
         # have a feature to split on, a left child (for when the
         # feature value is < 0.5) and a right child (for when the
         # feature value is >= 0.5)
-        
+
         self.isLeaf = True
         self.label  = 1
 
@@ -65,9 +65,13 @@ class DT(BinaryClassifier):
         """
 
         ### TODO: YOUR CODE HERE
-
-        return self.label
-
+        if self.isLeaf:
+            return self.label
+        else:
+            if X[self.feature] >= 0.5:
+                return self.right.predict(X)
+            else:
+                return self.left.predict(X)
 
     def trainDT(self, X, Y, maxDepth, used):
         """
@@ -76,6 +80,8 @@ class DT(BinaryClassifier):
 
         # get the size of the data set
         N,D = X.shape
+        bestLeftY =[]
+        bestRightY = []
 
         # check to see if we're either out of depth or no longer
         # have any decisions to make
@@ -100,19 +106,20 @@ class DT(BinaryClassifier):
 
                 # suppose we split on this feature; what labels
                 # would go left and right?
-                leftY  = []   ### TODO: YOUR CODE HERE
-                rightY = []    ### TODO: YOUR CODE HERE
+                leftY  =  Y[X[:,d]<0.5]  ### TODO: YOUR CODE HERE
+                rightY = Y[X[:,d]>=0.5]    ### TODO: YOUR CODE HERE
 
 
-                y_counter = 0
-                for fe_val in X[:,d]:
-                    if fe_val >= 0:
-                        rightY.append(Y[y_counter])
-                    else:
-                        leftY.append(Y[y_counter])
-
-                    y_counter += 1
-
+                # y_counter = 0
+                # for fe_val in X[:,d]:
+                #     if fe_val >= 0.5:
+                #         rightY.append(Y[y_counter])
+                #     else:
+                #         leftY.append(Y[y_counter])
+                #
+                #     y_counter += 1
+                # print 'left ==== {left}'.format(left = leftY)
+                # print rightY
 
                 # we'll classify the left points as their most
                 # common class and ditto right points.  our error
@@ -124,6 +131,8 @@ class DT(BinaryClassifier):
                 if error <= bestError:
                     bestFeature = d
                     bestError   = error
+                    bestLeftY = leftY
+                    bestRightY = rightY
 
 
 
@@ -142,9 +151,9 @@ class DT(BinaryClassifier):
                 self.left  = DT({'maxDepth': maxDepth-1})
                 self.right = DT({'maxDepth': maxDepth-1})
                 # recurse on our children by calling
-                #   self.left.trainDT(...) 
+                #   self.left.trainDT(...)
                 # and
-                #   self.right.trainDT(...) 
+                #   self.right.trainDT(...)
                 # with appropriate arguments
                 ### TODO: YOUR CODE HERE
 
@@ -152,8 +161,8 @@ class DT(BinaryClassifier):
                 used.append(self.feature)
                 Xne = delete(X,self.feature,1)
 
-                self.left.trainDT(Xne,leftY,maxDepth-1,used)
-                self.right.trainDT(Xne,rightY,maxDepth-1,used)
+                self.left.trainDT(X[X[:,self.feature] < 0.5,:],bestLeftY,maxDepth-1,used)
+                self.right.trainDT(X[X[:,self.feature] >= 0.5,:],bestRightY,maxDepth-1,used)
 
 
     def sizeWithoutK(self,k, arr):
@@ -172,17 +181,17 @@ class DT(BinaryClassifier):
 
         Some hints/suggestions:
           - make sure you don't build the tree deeper than self.opts['maxDepth']
-          
+
           - make sure you don't try to reuse features (this could lead
             to very deep trees that keep splitting on the same feature
             over and over again)
-            
+
           - it is very useful to be able to 'split' matrices and vectors:
             if you want the ids for all the Xs for which the 5th feature is
             on, say X(:,5)>=0.5.  If you want the corresponting classes,
             say Y(X(:,5)>=0.5) and if you want the correspnding rows of X,
             say X(X(:,5)>=0.5,:)
-            
+
           - i suggest having train() just call a second function that
             takes additional arguments telling us how much more depth we
             have left and what features we've used already
@@ -198,6 +207,6 @@ class DT(BinaryClassifier):
         Return our internal representation: for DTs, this is just our
         tree structure -- i.e., ourselves
         """
-        
+
         return self
 
