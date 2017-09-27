@@ -4,6 +4,7 @@ Implementation of k-nearest-neighbor classifier
 
 from numpy import *
 from pylab import *
+from math import *
 
 from binary import *
 
@@ -42,6 +43,12 @@ class KNN(BinaryClassifier):
         """
         return    "w=" + repr(self.weights)
 
+    def dist(self, x,y):
+        sum = 0
+        for n in range(0,x.size):
+            sum = sum + ((x[n] - y[n])**2)
+        return sqrt(sum)
+
     def predict(self, X):
         """
         X is a vector that we're supposed to make a prediction about.
@@ -64,9 +71,25 @@ class KNN(BinaryClassifier):
             # hint: look at the 'argsort' function in numpy
             K = self.opts['K']         # how many NN to use
 
-            val = 0                    # this is our return value: #pos - #neg of the K nearest neighbors of X
+            neg = 0
+            pos = 0
             ### TODO: YOUR CODE HERE
-            util.raiseNotDefined()
+            S = []
+            for n in range(0, N):
+                S.append([dist(X, self.trX[n, :]), n])  # S[k] = 2 value array
+
+            S = sorted(S, key=lambda x: x[0])
+
+            for k in range(0,K):
+                if k < len(S):
+                    near = S[k]  # near[0] == distance, near[1] == data point
+                    if self.trY[int(near[1])] >= 1:
+                        pos += 1
+                    else:
+                        neg += 1
+                else:
+                    break
+            val = pos - neg  # this is our return value: #pos - #neg of the K nearest neighbors of X
 
             return val
         else:
@@ -74,11 +97,30 @@ class KNN(BinaryClassifier):
             eps = self.opts['eps']     # how big is our epsilon ball
 
             val = 0                    # this is our return value: #pos - #neg within and epsilon ball of X
+            neg = 0
+            pos = 0
             ### TODO: YOUR CODE HERE
-            util.raiseNotDefined()
-            return val
+            S = []
+            for n in range(0, N):
+                S.append([dist(X, self.trX[n, :]), n])  # S[k] = 2 value array
+
+            S = sorted(S, key=lambda x: x[0])
+
+            ### TODO: YOUR CODE HERE
+            for k in range(0,N):
+               if k < len(S):
+                    near = S[k]
+                    if near[0] <= eps:
+                        if self.trY[int(near[1])] >= 1:
+                            pos += 1
+                        else:
+                            neg += 1
+                        break
+        val = pos - neg
+        return val
                 
             
+
 
 
     def getRepresentation(self):
