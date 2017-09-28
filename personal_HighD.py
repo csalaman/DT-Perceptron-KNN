@@ -7,19 +7,10 @@ import datasets as data
 waitForEnter=False
 
 def generateUniformExample(numDim):
-    return [random.random() for d in range(numDim)]
+    return data.DigitData.X[random.randint(0,100),:]
 
 def generateUniformDataset(numDim, numEx):
-    a = arange(data.DigitData.X.shape[1])
-    random.shuffle(a)
-    features_index = a[0:numDim]
-    new_table = []
-
-    for fea in features_index:
-        new_table.append(data.DigitData.X[0:numEx,fea])
-
-
-    return new_table
+    return [generateUniformExample(numDim) for n in range(numEx)]
 
 def computeExampleDistance(x1, x2):
     dist = 0.0
